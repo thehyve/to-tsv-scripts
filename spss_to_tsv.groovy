@@ -1,5 +1,3 @@
-package extract
-
 @Grapes([
         @Grab(group = 'com.bedatadriven.spss', module = 'spss-reader', version = '1.2'),
         @Grab(group = 'com.opencsv', module = 'opencsv', version = '4.0'),
@@ -35,13 +33,14 @@ if (header) {
 }
 
 int rowNumber = 0
-//TODO Encoding seems to be detected by the spss library. See SpssDataFileReader
-//TODO I am not sure whether it checks. We could apply juniversalchardet otherwise
-//assert spssReader.encoding == 'UTF-8'
 while (spssReader.readNextCase()) {
     List values = spssVariables.collect { SpssVariable variable ->
-        //TODO How to know a data type for a given variable
-        spssReader.getStringValue(variable.variableName)
+        //TODO There seems to be no Date type support.
+        if (variable.numeric) {
+            spssReader.getDoubleValue(variable.variableName)
+        } else {
+            spssReader.getStringValue(variable.variableName)
+        }
     }
     rowNumber += 1
     println "Writitng row number ${rowNumber}."
